@@ -3,12 +3,46 @@
 import { useState } from 'react';
 import Shell from '../../components/Shell';
 
-const PLATFORMS: { name: string; url: (u: string) => string }[] = [
-  { name: 'GitHub', url: (u) => `https://github.com/${u}` },
+interface Platform {
+  name: string;
+  url: (u: string) => string;
+  /** Optional live check — returns profile data if the account exists, null if not. */
+  check?: (u: string) => Promise<{ exists: boolean; detail?: string }>;
+}
+
+async function checkGitHub(u: string) {
+  try {
+    const r = await fetch(`https://api.github.com/users/${encodeURIComponent(u)}`);
+    if (r.status === 200) {
+      const j = await r.json();
+      return { exists: true, detail: `${j.public_repos ?? 0} repos · ${j.followers ?? 0} followers` };
+    }
+    return { exists: false };
+  } catch {
+    return { exists: false };
+  }
+}
+
+async function checkReddit(u: string) {
+  try {
+    const r = await fetch(`https://www.reddit.com/user/${encodeURIComponent(u)}/about.json`);
+    if (r.status === 200) {
+      const j = await r.json();
+      const karma = j?.data?.total_karma;
+      return { exists: true, detail: karma != null ? `${karma.toLocaleString()} karma` : undefined };
+    }
+    return { exists: false };
+  } catch {
+    return { exists: false };
+  }
+}
+
+const PLATFORMS: Platform[] = [
+  { name: 'GitHub', url: (u) => `https://github.com/${u}`, check: checkGitHub },
+  { name: 'Reddit', url: (u) => `https://www.reddit.com/user/${u}/`, check: checkReddit },
   { name: 'X / Twitter', url: (u) => `https://x.com/${u}` },
   { name: 'Instagram', url: (u) => `https://www.instagram.com/${u}/` },
   { name: 'TikTok', url: (u) => `https://www.tiktok.com/@${u}` },
-  { name: 'Reddit', url: (u) => `https://www.reddit.com/user/${u}/` },
   { name: 'YouTube', url: (u) => `https://www.youtube.com/@${u}` },
   { name: 'Twitch', url: (u) => `https://www.twitch.tv/${u}` },
   { name: 'Facebook', url: (u) => `https://www.facebook.com/${u}` },
@@ -16,7 +50,6 @@ const PLATFORMS: { name: string; url: (u: string) => string }[] = [
   { name: 'Pinterest', url: (u) => `https://www.pinterest.com/${u}/` },
   { name: 'Snapchat', url: (u) => `https://www.snapchat.com/add/${u}` },
   { name: 'Telegram', url: (u) => `https://t.me/${u}` },
-  { name: 'Discord (lookup)', url: (u) => `https://discordlookup.com/user/${u}` },
   { name: 'Steam', url: (u) => `https://steamcommunity.com/id/${u}` },
   { name: 'Spotify', url: (u) => `https://open.spotify.com/user/${u}` },
   { name: 'Medium', url: (u) => `https://medium.com/@${u}` },
@@ -26,46 +59,107 @@ const PLATFORMS: { name: string; url: (u: string) => string }[] = [
   { name: 'Gravatar', url: (u) => `https://en.gravatar.com/${u}` },
 ];
 
+type ResultState = Record<string, { state: 'checking' | 'hit' | 'miss'; detail?: string }>;
+
 export default function UsernamePage() {
   const [username, setUsername] = useState('');
   const [searched, setSearched] = useState('');
+  const [results, setResults] = useState<ResultState>({});
+  const [scanning, setScanning] = useState(false);
 
   const u = searched.trim().replace(/^@/, '');
 
+  const hunt = async () => {
+    const target = username.trim().replace(/^@/, '');
+    if (!target) return;
+    setSearched(target);
+    setScanning(true);
+    const initial: ResultState = {};
+    PLATFORMS.forEach((p) => {
+      initial[p.name] = p.check ? { state: 'checking' } : { state: 'miss' };
+    });
+    setResults(initial);
+
+    // Run live checks in parallel
+    await Promise.all(
+      PLATFORMS.filter((p) => p.check).map(async (p) => {
+        try {
+          const r = await p.check!(target);
+          setResults((prev) => ({
+            ...prev,
+            [p.name]: r.exists ? { state: 'hit', detail: r.detail } : { state: 'miss' },
+          }));
+        } catch {
+          setResults((prev) => ({ ...prev, [p.name]: { state: 'miss' } }));
+        }
+      })
+    );
+    setScanning(false);
+  };
+
+  const hits = Object.values(results).filter((r) => r.state === 'hit').length;
+
   return (
-    <Shell title="🔎 Username Research" sub="Cross-platform identity hunt">
+    <Shell title="Username Hunt" sub="Live cross-platform identity check">
       <div className="ns-panel">
-        <h2>Target username</h2>
         <div className="ns-row">
           <input
             className="ns-input"
-            placeholder="e.g. jaykk99"
+            placeholder="username (without @)"
             value={username}
             onChange={(e) => setUsername(e.target.value)}
-            onKeyDown={(e) => { if (e.key === 'Enter') setSearched(username); }}
+            onKeyDown={(e) => { if (e.key === 'Enter') hunt(); }}
             autoCapitalize="none"
             autoCorrect="off"
+            spellCheck={false}
           />
-          <button className="ns-btn" onClick={() => setSearched(username)} disabled={!username.trim()}>
-            Hunt
+          <button className="ns-btn" onClick={hunt} disabled={!username.trim() || scanning}>
+            {scanning ? 'Hunting…' : 'Hunt'}
           </button>
         </div>
         <p className="ns-note">
-          Opens each platform&apos;s profile URL for the username — a hit means an account exists there.
-          For automated enumeration, use the Error Inbox <b>osint_username</b> MCP tool.
+          GitHub & Reddit are verified live via API. Other platforms open directly — a loaded profile means the handle exists there.
         </p>
       </div>
 
       {u && (
         <div className="ns-panel">
-          <h2>Results for “{u}” <span className="ns-tag">{PLATFORMS.length} platforms</span></h2>
+          <h2>
+            Results for “{u}”
+            {hits > 0 && <span className="ns-pill green" style={{ marginLeft: 8 }}>{hits} confirmed</span>}
+          </h2>
           <div className="ns-link-list">
-            {PLATFORMS.map((p) => (
-              <a key={p.name} href={p.url(encodeURIComponent(u))} target="_blank" rel="noreferrer" className="ns-link">
-                <span>{p.name} <span style={{ color: 'var(--muted)', fontSize: 12 }}>/ {u}</span></span>
-                <span className="arrow">→</span>
-              </a>
-            ))}
+            {PLATFORMS.map((p) => {
+              const r = results[p.name];
+              return (
+                <a
+                  key={p.name}
+                  href={p.url(encodeURIComponent(u))}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="ns-link"
+                >
+                  <span>
+                    <span className="name">{p.name}</span>
+                    {r?.detail && <div className="desc">{r.detail}</div>}
+                    {!r?.detail && <div className="desc">/{u}</div>}
+                  </span>
+                  {r ? (
+                    r.state === 'checking' ? (
+                      <span className="status checking"><span className="ns-spinner" style={{ width: 10, height: 10, marginRight: 4 }} />checking</span>
+                    ) : r.state === 'hit' ? (
+                      <span className="status hit">✓ exists</span>
+                    ) : p.check ? (
+                      <span className="status miss">not found</span>
+                    ) : (
+                      <span className="arrow">→</span>
+                    )
+                  ) : (
+                    <span className="arrow">→</span>
+                  )}
+                </a>
+              );
+            })}
           </div>
         </div>
       )}

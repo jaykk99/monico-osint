@@ -10,7 +10,7 @@ const CAM_SOURCES = [
 
 export default function CamerasPage() {
   return (
-    <Shell title="📷 Camera Globe" sub="Public live webcams — visual intelligence">
+    <Shell title="Camera Globe" sub="Public live webcams — visual intelligence">
       <div className="ns-panel">
         <h2>Live wind & webcam map</h2>
         <div className="ns-embed">

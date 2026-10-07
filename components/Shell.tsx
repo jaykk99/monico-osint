@@ -12,14 +12,14 @@ export default function Shell({
 }) {
   return (
     <main className="ns-page">
-      <div className="ns-shell-head">
+      <div className="ns-topbar">
         <Link href="/" className="ns-back">←</Link>
         <div>
-          <h1>{title}</h1>
-          {sub && <p className="sub">{sub}</p>}
+          <h1 className="ns-title">{title}</h1>
+          {sub && <p className="ns-sub">{sub}</p>}
         </div>
       </div>
-      {children}
+      <div style={{ paddingTop: 4 }}>{children}</div>
     </main>
   );
 }

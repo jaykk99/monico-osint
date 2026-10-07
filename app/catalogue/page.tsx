@@ -30,7 +30,7 @@ const REGISTRIES: { group: string; items: { name: string; url: string; desc: str
 
 export default function CataloguePage() {
   return (
-    <Shell title="📚 Catalogue" sub="Public corporate & government registries">
+    <Shell title="Catalogue" sub="Public corporate & government registries">
       {REGISTRIES.map((g) => (
         <div className="ns-panel" key={g.group}>
           <h2>{g.group}</h2>

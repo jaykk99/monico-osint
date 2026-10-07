@@ -11,7 +11,7 @@ const SDRS = [
 
 export default function SkywavePage() {
   return (
-    <Shell title="📻 Skywave" sub="Public software-defined radio receivers">
+    <Shell title="Skywave" sub="Public software-defined radio receivers">
       <div className="ns-panel">
         <h2>SDR receivers</h2>
         <p className="desc">

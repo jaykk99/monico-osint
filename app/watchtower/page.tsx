@@ -36,7 +36,7 @@ const FEEDS: { group: string; items: { name: string; url: string; desc: string }
 
 export default function WatchtowerPage() {
   return (
-    <Shell title="🗼 Watchtower" sub="Global situational awareness — live feeds">
+    <Shell title="Watchtower" sub="Global situational awareness — live feeds">
       {FEEDS.map((g) => (
         <div className="ns-panel" key={g.group}>
           <h2>{g.group}</h2>

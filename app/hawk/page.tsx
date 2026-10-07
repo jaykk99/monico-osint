@@ -43,7 +43,7 @@ export default function HawkPage() {
   const tagCount = result ? Object.keys(result.tags).length : 0;
 
   return (
-    <Shell title="🦅 Hawk" sub="Image EXIF & metadata forensics — runs 100% on-device">
+    <Shell title="Hawk" sub="Image EXIF & metadata forensics — runs 100% on-device">
       <div className="ns-panel">
         <h2>Analyze a photo</h2>
         <div className="ns-row">

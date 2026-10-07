@@ -29,7 +29,7 @@ export default function FishermanPage() {
   };
 
   return (
-    <Shell title="🎣 Fisherman" sub="Link shortener for controlled sharing">
+    <Shell title="Fisherman" sub="Link shortener for controlled sharing">
       <div className="ns-panel">
         <h2>Shorten a link</h2>
         <div className="ns-row" style={{ flexDirection: 'column', alignItems: 'stretch' }}>
