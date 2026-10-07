@@ -17,8 +17,8 @@ export default function FishermanPage() {
     setShort('');
     setWorking(true);
     try {
-      // is.gd simple API — free, no key, CORS-enabled
-      const r = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`);
+      // TinyURL simple API — free, no key, CORS-enabled
+      const r = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`);
       const text = (await r.text()).trim();
       if (!r.ok || !text.startsWith('http')) throw new Error('shortener failed');
       setShort(text);
@@ -76,7 +76,7 @@ export default function FishermanPage() {
           </div>
         )}
         <p className="ns-note">
-          v1 uses is.gd for shortening. Hit logging / visitor telemetry is a v2 backend feature.
+          v1 uses TinyURL for shortening. Hit logging / visitor telemetry is a v2 backend feature.
           Only share links with people you have a legitimate reason to track.
         </p>
       </div>
