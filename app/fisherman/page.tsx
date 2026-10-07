@@ -64,6 +64,14 @@ export default function FishermanPage() {
               <button className="ns-btn-ghost" onClick={() => navigator.clipboard?.writeText(short)}>
                 Copy link
               </button>
+              <a
+                className="ns-btn-ghost"
+                href={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(short)}`}
+                target="_blank"
+                rel="noreferrer"
+              >
+                QR code
+              </a>
             </div>
           </div>
         )}

@@ -15,12 +15,27 @@ interface IpInfo {
   lon?: number;
 }
 
+interface DnsRecord {
+  type: string;
+  values: string[];
+}
+
 const isIp = (t: string) => /^(\d{1,3}\.){3}\d{1,3}$/.test(t.trim());
+
+async function lookupDns(domain: string, type: string): Promise<string[]> {
+  const r = await fetch(
+    `https://cloudflare-dns.com/dns-query?name=${encodeURIComponent(domain)}&type=${type}`,
+    { headers: { accept: 'application/dns-json' } }
+  );
+  const j = await r.json();
+  return (j.Answer || []).map((a: any) => a.data as string);
+}
 
 export default function NetScanPage() {
   const [target, setTarget] = useState('');
   const [searched, setSearched] = useState('');
   const [info, setInfo] = useState<IpInfo | null>(null);
+  const [dns, setDns] = useState<DnsRecord[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -31,12 +46,12 @@ export default function NetScanPage() {
     if (!input) return;
     setSearched(input);
     setInfo(null);
+    setDns([]);
     setError('');
+    setLoading(true);
 
-    // Live IP intel — works for IPs directly; for domains we link tools below
-    if (isIp(input)) {
-      setLoading(true);
-      try {
+    try {
+      if (isIp(input)) {
         const r = await fetch(`https://ip-api.com/json/${encodeURIComponent(input)}?fields=status,message,country,regionName,city,lat,lon,isp,org,as,query`);
         const j = await r.json();
         if (j.status !== 'success') throw new Error(j.message || 'lookup failed');
@@ -51,11 +66,27 @@ export default function NetScanPage() {
           lat: j.lat,
           lon: j.lon,
         });
-      } catch {
-        setError('IP lookup failed — try again or use the tools below.');
+      } else {
+        // Live DNS records via Cloudflare DoH
+        const types = ['A', 'AAAA', 'MX', 'TXT', 'NS', 'CNAME'];
+        const results = await Promise.all(
+          types.map(async (type) => {
+            try {
+              const values = await lookupDns(input, type);
+              return values.length ? { type, values } : null;
+            } catch {
+              return null;
+            }
+          })
+        );
+        const found = results.filter(Boolean) as DnsRecord[];
+        if (!found.length) throw new Error('No DNS records found');
+        setDns(found);
       }
-      setLoading(false);
+    } catch (e: any) {
+      setError(e?.message || 'Lookup failed — try again or use the tools below.');
     }
+    setLoading(false);
   };
 
   const TOOLS = [
@@ -116,6 +147,27 @@ export default function NetScanPage() {
                     </td>
                   </tr>
                 )}
+              </tbody>
+            </table>
+          </div>
+        </div>
+      )}
+
+      {t && dns.length > 0 && (
+        <div className="ns-panel">
+          <h2>
+            DNS records
+            <span className="ns-pill green" style={{ marginLeft: 8 }}>live</span>
+          </h2>
+          <div className="ns-result">
+            <table>
+              <tbody>
+                {dns.map((r) => (
+                  <tr key={r.type}>
+                    <td><b style={{ color: 'var(--accent)' }}>{r.type}</b></td>
+                    <td>{r.values.map((v, i) => <div key={i}>{v}</div>)}</td>
+                  </tr>
+                ))}
               </tbody>
             </table>
           </div>

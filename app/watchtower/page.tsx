@@ -1,5 +1,41 @@
 import Shell from '../../components/Shell';
 
+export default function WatchtowerPage() {
+  return (
+    <Shell title="Watchtower" sub="Global situational awareness — live">
+      <div className="ns-panel">
+        <h2>Live flight tracking</h2>
+        <div className="ns-embed">
+          <iframe
+            title="ADS-B Exchange globe"
+            src="https://globe.adsbexchange.com/"
+            loading="lazy"
+            allow="geolocation"
+          />
+        </div>
+        <p className="ns-note">Unfiltered ADS-B — every aircraft broadcasting right now.</p>
+      </div>
+
+      {FEEDS.map((g) => (
+        <div className="ns-panel" key={g.group}>
+          <h2>{g.group}</h2>
+          <div className="ns-link-list">
+            {g.items.map((x) => (
+              <a key={x.url} href={x.url} target="_blank" rel="noreferrer" className="ns-link">
+                <span>
+                  <span className="name">{x.name}</span>
+                  <div className="desc">{x.desc}</div>
+                </span>
+                <span className="arrow">→</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      ))}
+    </Shell>
+  );
+}
+
 const FEEDS: { group: string; items: { name: string; url: string; desc: string }[] }[] = [
   {
     group: 'Aviation',
@@ -34,22 +70,3 @@ const FEEDS: { group: string; items: { name: string; url: string; desc: string }
   },
 ];
 
-export default function WatchtowerPage() {
-  return (
-    <Shell title="Watchtower" sub="Global situational awareness — live feeds">
-      {FEEDS.map((g) => (
-        <div className="ns-panel" key={g.group}>
-          <h2>{g.group}</h2>
-          <div className="ns-link-list">
-            {g.items.map((x) => (
-              <a key={x.url} href={x.url} target="_blank" rel="noreferrer" className="ns-link">
-                <span><b>{x.name}</b><br /><span style={{ color: 'var(--muted)', fontSize: 12 }}>{x.desc}</span></span>
-                <span className="arrow">→</span>
-              </a>
-            ))}
-          </div>
-        </div>
-      ))}
-    </Shell>
-  );
-}
