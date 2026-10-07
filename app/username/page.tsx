@@ -118,14 +118,42 @@ export default function UsernamePage() {
   const [searched, setSearched] = useState('');
   const [results, setResults] = useState<ResultState>({});
   const [scanning, setScanning] = useState(false);
+  const [deepResults, setDeepResults] = useState<any[]>([]);
+  const [deepScanning, setDeepScanning] = useState(false);
 
   const u = searched.trim().replace(/^@/, '');
+
+  const OSINT_KEY = process.env.NEXT_PUBLIC_OSINT_KEY || '';
+  const ERROR_INBOX = 'https://error-inbox.vercel.app';
+
+  /** Deep check via Error Inbox MCP — 100+ sites including X, IG, TikTok. */
+  const deepHunt = async () => {
+    const target = username.trim().replace(/^@/, '');
+    if (!target || !OSINT_KEY) return;
+    setDeepScanning(true);
+    setDeepResults([]);
+    try {
+      const r = await fetch(`${ERROR_INBOX}/api/osint/username`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'x-api-bell-key': OSINT_KEY },
+        body: JSON.stringify({ username: target, maxSites: 80 }),
+      }).then((x) => x.json());
+      if (r?.ok && Array.isArray(r.hits)) {
+        setDeepResults(r.hits);
+      }
+    } catch {
+      // fall back to client-side checks
+    }
+    setDeepScanning(false);
+  };
 
   const hunt = async () => {
     const target = username.trim().replace(/^@/, '');
     if (!target) return;
     setSearched(target);
     setScanning(true);
+    // Start deep MCP check in parallel (don't await)
+    deepHunt();
     const initial: ResultState = {};
     PLATFORMS.forEach((p) => {
       initial[p.name] = p.check ? { state: 'checking' } : { state: 'miss' };
@@ -181,6 +209,36 @@ export default function UsernamePage() {
             Results for “{u}”
             {hits > 0 && <span className="ns-pill green" style={{ marginLeft: 8 }}>{hits} confirmed</span>}
           </h2>
+
+          {(deepScanning || deepResults.length > 0) && (
+            <>
+              <div className="ns-section-title">
+                Deep scan — 100+ platforms
+                {deepScanning && <span className="ns-spinner" style={{ marginLeft: 8 }} />}
+              </div>
+              {deepResults.length > 0 && (
+                <div className="ns-link-list" style={{ marginBottom: 16 }}>
+                  {deepResults.map((h: any, i: number) => (
+                    <a
+                      key={i}
+                      href={h.url}
+                      target="_blank"
+                      rel="noreferrer"
+                      className="ns-link"
+                    >
+                      <span>
+                        <span className="name">{h.site || h.name}</span>
+                        <div className="desc">{h.category || ''}</div>
+                      </span>
+                      <span className="status hit">✓ exists</span>
+                    </a>
+                  ))}
+                </div>
+              )}
+              <div className="ns-section-title">Quick checks</div>
+            </>
+          )}
+
           <div className="ns-link-list">
             {PLATFORMS.map((p) => {
               const r = results[p.name];
