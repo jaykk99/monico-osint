@@ -37,9 +37,61 @@ async function checkReddit(u: string) {
   }
 }
 
+async function checkGitLab(u: string) {
+  try {
+    const r = await fetch(`https://gitlab.com/api/v4/users?username=${encodeURIComponent(u)}`);
+    if (r.status === 200) {
+      const j = await r.json();
+      if (Array.isArray(j) && j.length > 0) {
+        return { exists: true, detail: j[0]?.name || 'GitLab user' };
+      }
+    }
+    return { exists: false };
+  } catch {
+    return { exists: false };
+  }
+}
+
+async function checkHackerNews(u: string) {
+  try {
+    const r = await fetch(`https://hacker-news.firebaseio.com/v0/user/${encodeURIComponent(u)}.json`);
+    if (r.status === 200) {
+      const j = await r.json();
+      if (j && j.id) {
+        return { exists: true, detail: `${(j.karma || 0).toLocaleString()} karma` };
+      }
+    }
+    return { exists: false };
+  } catch {
+    return { exists: false };
+  }
+}
+
+async function checkStackOverflow(u: string) {
+  try {
+    const r = await fetch(
+      `https://api.stackexchange.com/2.3/users?inname=${encodeURIComponent(u)}&site=stackoverflow&pagesize=1`
+    );
+    if (r.status === 200) {
+      const j = await r.json();
+      const user = j?.items?.[0];
+      // Only count as hit if display name closely matches
+      if (user && user.display_name?.toLowerCase() === u.toLowerCase()) {
+        return { exists: true, detail: `${(user.reputation || 0).toLocaleString()} rep` };
+      }
+    }
+    return { exists: false };
+  } catch {
+    return { exists: false };
+  }
+}
+
 const PLATFORMS: Platform[] = [
   { name: 'GitHub', url: (u) => `https://github.com/${u}`, check: checkGitHub },
+  { name: 'GitLab', url: (u) => `https://gitlab.com/${u}`, check: checkGitLab },
   { name: 'Reddit', url: (u) => `https://www.reddit.com/user/${u}/`, check: checkReddit },
+  { name: 'Hacker News', url: (u) => `https://news.ycombinator.com/user?id=${u}`, check: checkHackerNews },
+  { name: 'Stack Overflow', url: (u) => `https://stackoverflow.com/users/${u}`, check: checkStackOverflow },
   { name: 'X / Twitter', url: (u) => `https://x.com/${u}` },
   { name: 'Instagram', url: (u) => `https://www.instagram.com/${u}/` },
   { name: 'TikTok', url: (u) => `https://www.tiktok.com/@${u}` },
@@ -118,7 +170,8 @@ export default function UsernamePage() {
           </button>
         </div>
         <p className="ns-note">
-          GitHub & Reddit are verified live via API. Other platforms open directly — a loaded profile means the handle exists there.
+          GitHub, GitLab, Reddit, Hacker News & Stack Overflow are verified live via API.
+          Other platforms open directly — a loaded profile means the handle exists there.
         </p>
       </div>
 
