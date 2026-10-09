@@ -5,7 +5,6 @@ const CAM_SOURCES = [
   { name: 'EarthCam', url: 'https://www.earthcam.com/', desc: 'Live streaming webcams worldwide' },
   { name: 'SkylineWebcams', url: 'https://www.skylinewebcams.com/en.html', desc: 'Live cams — cities, beaches, landmarks' },
   { name: 'WorldCam', url: 'https://worldcam.eu/', desc: 'Webcam directory by country' },
-  { name: 'Insecam (unsecured cams)', url: 'http://www.insecam.org/', desc: 'Publicly accessible camera directory' },
 ];
 
 export default function CamerasPage() {
