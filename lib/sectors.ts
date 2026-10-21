@@ -17,4 +17,7 @@ export const SECTORS: Sector[] = [
   { id: 'catalogue', name: 'Catalogue', icon: '📚', blurb: 'Company & public record search', accent: 'teal' },
   { id: 'certscan', name: 'Cert Scan', icon: '📜', blurb: 'Subdomains from Certificate Transparency logs', accent: 'cyan' },
   { id: 'watchtower', name: 'Watchtower', icon: '🗼', blurb: 'Live flights, ships & threats', accent: 'red' },
+  { id: 'wayback', name: 'Wayback', icon: '🕰️', blurb: 'Domain snapshot history from the Internet Archive', accent: 'gold' },
+  { id: 'dnslookup', name: 'DNS Lookup', icon: '📡', blurb: 'MX, TXT, NS, A records via DNS-over-HTTPS', accent: 'blue' },
+  { id: 'unshorten', name: 'Unshorten', icon: '🔗', blurb: 'Expand short links, inspect the redirect chain', accent: 'purple' },
 ];

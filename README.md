@@ -14,6 +14,9 @@ team is paused; the code builds and runs clean locally)
 | `/cameras` | Public camera feeds |
 | `/catalogue` | Company / entity catalogue lookup |
 | `/certscan` | Subdomains via Certificate Transparency logs (crt.sh) |
+| `/dnslookup` | DNS records (MX/TXT/NS/A…) via Cloudflare DNS-over-HTTPS |
+| `/unshorten` | Short-URL expander with redirect chain + phishing heuristics |
+| `/wayback` | Domain snapshot history via the Wayback Machine CDX API |
 | `/crypto` | Wallet address lookup |
 | `/fisherman` | Link tracking helper |
 | `/hawk` | Monitoring view |

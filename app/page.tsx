@@ -20,7 +20,7 @@ export default function Home() {
           <div className="logo-star">★</div>
           <h1>North Star</h1>
         </div>
-        <p>Jay&apos;s personal OSINT dashboard — 10 sectors, real tools</p>
+        <p>Jay&apos;s personal OSINT dashboard — 13 sectors, real tools</p>
       </header>
 
       <div className="ns-search">

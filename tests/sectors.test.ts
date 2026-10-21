@@ -7,8 +7,8 @@ const ACCENTS: Sector['accent'][] = [
 ];
 
 describe('SECTORS registry', () => {
-  it('has all 10 sectors with unique ids', () => {
-    expect(SECTORS.length).toBe(10);
+  it('has all 13 sectors with unique ids', () => {
+    expect(SECTORS.length).toBe(13);
     const ids = SECTORS.map((s) => s.id);
     expect(new Set(ids).size).toBe(ids.length);
   });
