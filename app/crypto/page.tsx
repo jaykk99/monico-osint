@@ -2,19 +2,7 @@
 
 import { useState } from 'react';
 import Shell from '../../components/Shell';
-
-function guessChain(addr: string): { chain: string; blockchair: string | null } {
-  const a = addr.trim();
-  if (/^(bc1|1|3)[a-zA-Z0-9]{25,62}$/.test(a)) return { chain: 'Bitcoin', blockchair: 'bitcoin' };
-  if (/^0x[a-fA-F0-9]{40}$/.test(a)) return { chain: 'Ethereum', blockchair: 'ethereum' };
-  if (/^[1-9A-HJ-NP-Za-km-z]{32,44}$/.test(a)) return { chain: 'Solana (likely)', blockchair: null };
-  if (/^T[a-zA-Z0-9]{33}$/.test(a)) return { chain: 'Tron', blockchair: null };
-  if (/^r[a-zA-Z0-9]{24,34}$/.test(a)) return { chain: 'XRP', blockchair: 'ripple' };
-  if (/^(addr1|stake1)/.test(a)) return { chain: 'Cardano', blockchair: 'cardano' };
-  if (/^ltc1|^[LM3][a-km-zA-HJ-NP-Z1-9]{26,33}$/.test(a)) return { chain: 'Litecoin', blockchair: 'litecoin' };
-  if (/^D[A-Za-z0-9]{33}$/.test(a)) return { chain: 'Dogecoin', blockchair: 'dogecoin' };
-  return { chain: 'Unknown', blockchair: null };
-}
+import { guessChain, CHAIN_SYMBOLS, formatChainAmount } from '../../lib/chains';
 
 interface ChainData {
   balance: string;
@@ -62,16 +50,13 @@ export default function CryptoPage() {
       const j = await r.json();
       const info = j?.data?.[target]?.address;
       if (!info) throw new Error('no data');
-      const decimals = { bitcoin: 8, ethereum: 18, ripple: 6, cardano: 6, litecoin: 8, dogecoin: 8 } as Record<string, number>;
-      const symbols = { bitcoin: 'BTC', ethereum: 'ETH', ripple: 'XRP', cardano: 'ADA', litecoin: 'LTC', dogecoin: 'DOGE' } as Record<string, string>;
-      const d = decimals[bc] ?? 8;
-      const fmt = (v: number | string) => (Number(v) / 10 ** d).toLocaleString(undefined, { maximumFractionDigits: 6 });
+      const fmt = (v: number | string) => formatChainAmount(v, bc);
       setData({
         balance: fmt(info.balance ?? 0),
         txCount: info.transaction_count ?? 0,
         totalReceived: fmt(info.received ?? 0),
         totalSent: fmt(info.spent ?? 0),
-        symbol: symbols[bc] ?? '',
+        symbol: CHAIN_SYMBOLS[bc] ?? '',
       });
       // Recent transactions
       const txList = (j?.data?.[target]?.transactions || []).slice(0, 5).map((tx: any) => ({
