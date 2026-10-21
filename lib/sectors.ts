@@ -15,5 +15,6 @@ export const SECTORS: Sector[] = [
   { id: 'skywave', name: 'Skywave', icon: '📻', blurb: 'Live public radio receivers', accent: 'purple' },
   { id: 'fisherman', name: 'Fisherman', icon: '🎣', blurb: 'Shorten & share tracked links', accent: 'pink' },
   { id: 'catalogue', name: 'Catalogue', icon: '📚', blurb: 'Company & public record search', accent: 'teal' },
+  { id: 'certscan', name: 'Cert Scan', icon: '📜', blurb: 'Subdomains from Certificate Transparency logs', accent: 'cyan' },
   { id: 'watchtower', name: 'Watchtower', icon: '🗼', blurb: 'Live flights, ships & threats', accent: 'red' },
 ];

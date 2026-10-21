@@ -13,6 +13,7 @@ team is paused; the code builds and runs clean locally)
 | `/` | Dashboard home |
 | `/cameras` | Public camera feeds |
 | `/catalogue` | Company / entity catalogue lookup |
+| `/certscan` | Subdomains via Certificate Transparency logs (crt.sh) |
 | `/crypto` | Wallet address lookup |
 | `/fisherman` | Link tracking helper |
 | `/hawk` | Monitoring view |
