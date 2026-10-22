@@ -294,6 +294,7 @@ a { color: inherit; }
 .ns-pill.green { background: var(--green-dim); color: var(--green); }
 .ns-pill.red { background: var(--red-dim); color: var(--red); }
 .ns-pill.gold { background: var(--gold-dim); color: var(--gold); }
+.ns-pill.gray { background: rgba(139,147,168,.15); color: var(--muted); }
 
 /* ---------- spinner ---------- */
 .ns-spinner {

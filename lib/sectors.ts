@@ -20,4 +20,7 @@ export const SECTORS: Sector[] = [
   { id: 'wayback', name: 'Wayback', icon: '🕰️', blurb: 'Domain snapshot history from the Internet Archive', accent: 'gold' },
   { id: 'dnslookup', name: 'DNS Lookup', icon: '📡', blurb: 'MX, TXT, NS, A records via DNS-over-HTTPS', accent: 'blue' },
   { id: 'unshorten', name: 'Unshorten', icon: '🔗', blurb: 'Expand short links, inspect the redirect chain', accent: 'purple' },
+  { id: 'mailshield', name: 'MailShield', icon: '✉️', blurb: 'Email authentication posture: SPF, DMARC, MTA-STS', accent: 'green' },
+  { id: 'codetrail', name: 'CodeTrail', icon: '💻', blurb: 'Public GitHub profile intelligence', accent: 'orange' },
+  { id: 'iconhash', name: 'IconHash', icon: '🧬', blurb: 'Favicon fingerprinting — find a site\u2019s twins', accent: 'teal' },
 ];

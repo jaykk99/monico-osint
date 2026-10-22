@@ -16,6 +16,9 @@ team is paused; the code builds and runs clean locally)
 | `/certscan` | Subdomains via Certificate Transparency logs (crt.sh) |
 | `/dnslookup` | DNS records (MX/TXT/NS/A…) via Cloudflare DNS-over-HTTPS |
 | `/unshorten` | Short-URL expander with redirect chain + phishing heuristics |
+| `/mailshield` | Email auth posture: SPF, DMARC, MTA-STS, TLS-RPT, BIMI via DoH |
+| `/codetrail` | Public GitHub profile intelligence (no login) |
+| `/iconhash` | Favicon fingerprinting (Shodan http.favicon.hash scheme) |
 | `/wayback` | Domain snapshot history via the Wayback Machine CDX API |
 | `/crypto` | Wallet address lookup |
 | `/fisherman` | Link tracking helper |
