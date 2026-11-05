@@ -3,7 +3,7 @@
 Jay's personal OSINT dashboard — a single Next.js app that groups open-source
 intelligence lookups in one place.
 
-Live: none — the Vercel team is paused; the code builds and runs clean locally
+Live: https://jaykk99.github.io/monico-osint/ (GitHub Pages static export; the old Vercel deploy is dead — team paused)
 
 ## Modules
 
